@@ -377,9 +377,6 @@ class Account:
                                                                                         else:
                                                                                             logging.info(f"{Fore.RED} {r.status_code} | Failed to send custom announcement!{Fore.RESET}")
                                                                                             print(r.json())
-            except AttributeError as e:
-                custom_info(f"No custom announcement detected | {e}")
-                custom_info("type >generate in #bot-commands in the discord to announce your snipes")
 
 
 def gather_info():
