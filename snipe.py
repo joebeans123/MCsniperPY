@@ -378,7 +378,6 @@ class Account:
                                                                                             logging.info(f"{Fore.RED} {r.status_code} | Failed to send custom announcement!{Fore.RESET}")
                                                                                             print(r.json())
 
-
 def gather_info():
     block_snipe = 0
     target_username = custom_input(f"What name would you like to {['snipe', 'block'][block_snipe]}: ")
