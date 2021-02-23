@@ -381,10 +381,11 @@ class session:
                 elapsed_time = end - start
                 for acc in self.accounts:
                     if acc.got_name:
-                        time.sleep(2)
+                        time.sleep(1)
                         loop = asyncio.get_event_loop()
                         coros = [worker(i) for i in range(50)]
                         loop.run_until_complete(acc.webhook_skin_write_file(self.block_snipe))
+                        loop.close()
                 rq_sec = sent_reqs / elapsed_time
                 times.append(rq_sec)
                 logging.info(f"{Fore.GREEN}{str(sum(times))[0:13]}{Fore.CYAN} rqs/sec (ESTIMATE) {Fore.WHITE}|{Fore.CYAN} Took {Fore.WHITE}{str(elapsed_time)[0:8]}{Fore.CYAN} seconds{Fore.RESET} | {sent_reqs} requests")
