@@ -377,6 +377,7 @@ class Account:
                                                                                         else:
                                                                                             logging.info(f"{Fore.RED} {r.status_code} | Failed to send custom announcement!{Fore.RESET}")
                                                                                             print(r.json())
+                                                                                            end()
 
 def gather_info():
     block_snipe = 0
