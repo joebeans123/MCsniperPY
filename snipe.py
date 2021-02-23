@@ -36,6 +36,47 @@ max_accs:30
 auto_link_namemc:false NOT IMPLEMENTED
 """
 
+def gather_info():
+    block_snipe = 0
+    target_username = custom_input(f"What name would you like to {['snipe', 'block'][block_snipe]}: ")
+    try:
+        delay = int(custom_input("Custom delay in ms: "))
+    except ValueError:
+        print('thats not a valid number')
+    return block_snipe, target_username, delay
+
+
+def load_accounts_file():
+    accounts = []
+    if not path.exists("accounts.txt"):
+        print(f"{Fore.WHITE}[{Fore.RED}ERROR{Fore.WHITE}]{Fore.RESET} accounts.txt not found | creating one")
+        open('accounts.txt', 'w+')
+        input("Press enter to reload accounts. ")
+        load_accounts_file()
+    else:
+        accounts = open('accounts.txt').readlines()
+        if len(accounts) == 0:
+            print(f"Accounts not found in accounts.txt file please add accounts with format (email:pass) or (email:pass:q1:q2:q3)")
+            input("Press any key to reload accounts.")
+            load_accounts_file()
+        if len(accounts) > config.max_accs:
+            print(f"{Fore.WHITE}[{Fore.YELLOW}warning{Fore.WHITE}]{Fore.RESET} you inputted too many accounts | removing {len(accounts) - config.max_accs}")
+            accounts = accounts[0:30]
+    return accounts
+
+
+def load_accounts():
+    accounts = []
+    for acc in load_accounts_file():
+        acc = acc.rstrip().split(":")
+        if acc == ['']:
+            continue
+        try:
+            accounts.append(Account(acc[0], acc[1], [acc[2], acc[3], acc[4]]))
+        except IndexError:
+            accounts.append(Account(acc[0], acc[1]))
+    return accounts
+
 
 def custom_info(message):
     logging.info(f"{Fore.WHITE}[{Fore.BLUE}info{Fore.WHITE}] {Fore.RESET}{message}")
@@ -378,47 +419,6 @@ class Account:
                                                                                             logging.info(f"{Fore.RED} {r.status_code} | Failed to send custom announcement!{Fore.RESET}")
                                                                                             print(r.json())
                                                                                             end()
-
-def gather_info():
-    block_snipe = 0
-    target_username = custom_input(f"What name would you like to {['snipe', 'block'][block_snipe]}: ")
-    try:
-        delay = int(custom_input("Custom delay in ms: "))
-    except ValueError:
-        print('thats not a valid number')
-    return block_snipe, target_username, delay
-
-
-def load_accounts_file():
-    accounts = []
-    if not path.exists("accounts.txt"):
-        print(f"{Fore.WHITE}[{Fore.RED}ERROR{Fore.WHITE}]{Fore.RESET} accounts.txt not found | creating one")
-        open('accounts.txt', 'w+')
-        input("Press enter to reload accounts. ")
-        load_accounts_file()
-    else:
-        accounts = open('accounts.txt').readlines()
-        if len(accounts) == 0:
-            print(f"Accounts not found in accounts.txt file please add accounts with format (email:pass) or (email:pass:q1:q2:q3)")
-            input("Press any key to reload accounts.")
-            load_accounts_file()
-        if len(accounts) > config.max_accs:
-            print(f"{Fore.WHITE}[{Fore.YELLOW}warning{Fore.WHITE}]{Fore.RESET} you inputted too many accounts | removing {len(accounts) - config.max_accs}")
-            accounts = accounts[0:30]
-    return accounts
-
-
-def load_accounts():
-    accounts = []
-    for acc in load_accounts_file():
-        acc = acc.rstrip().split(":")
-        if acc == ['']:
-            continue
-        try:
-            accounts.append(Account(acc[0], acc[1], [acc[2], acc[3], acc[4]]))
-        except IndexError:
-            accounts.append(Account(acc[0], acc[1]))
-    return accounts
 
 
 class session:
