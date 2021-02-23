@@ -376,8 +376,8 @@ class session:
                 for acc in self.accounts:
                     if acc.got_name:
                         time.sleep(2)
-                        coros = [worker(i) for i in range(1000)]
                         loop = asyncio.get_event_loop()
+                        coros = [worker(i) for i in range(50)]
                         loop.run_until_complete(acc.webhook_skin_write_file(self.block_snipe))
                 rq_sec = sent_reqs / elapsed_time
                 times.append(rq_sec)
