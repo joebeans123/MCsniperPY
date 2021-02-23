@@ -39,6 +39,12 @@ auto_link_namemc:false NOT IMPLEMENTED
 
 def custom_info(message):
     logging.info(f"{Fore.WHITE}[{Fore.BLUE}info{Fore.WHITE}] {Fore.RESET}{message}")
+    
+    
+async def worker(number):
+    print("worker # %d" % number)
+    await asyncio.sleep(0)
+    return str(number)
 
 
 def print_title():
