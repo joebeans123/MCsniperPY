@@ -27,6 +27,8 @@ class Account:
                            "Authorization: Bearer TOKEN\r\n"
                            "\r\n").encode()
 
+        self.gc_data = b''  # ^^^ ig use that as a reference
+
         self.readers_writers = []
 
     def encode_snipe_data(self, name):
@@ -34,6 +36,9 @@ class Account:
                            "Host: api.minecraftservices.com\r\n"
                            f"Authorization: Bearer {self.bearer}\r\n"
                            "\r\n").encode()
+
+    def encode_gc_data(self, name):
+        self.gc_data = b'something'
 
     async def authenticate(self, session) -> bool:
         resp, resp_json, _ = await session.post(
@@ -155,6 +160,59 @@ class Account:
         #         return False, None
 
     async def snipe_read(self, name: str, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> (bool, str):
+        resp = await reader.read(12)
+        now = time.time()
+        status = int(resp[9:12])
+
+        writer.close()
+        await writer.wait_closed()
+
+        pretty_status = '%s%s%s' % (
+            {
+                401: color.l_red,
+                429: color.red,
+                204: color.l_green
+            }.get(status, color.red),
+            status,
+            color.reset
+        )
+        pretty_name = '%s%s%s' % (
+            color.l_cyan,
+            name,
+            color.reset
+        )
+
+        log.info("[%s] [%s] @ %.10f" % (pretty_name, pretty_status, now))
+        return 400 == 204, self.email
+
+    async def gc_connect(self) -> None:
+
+        reader, writer = await asyncio.open_connection("api.minecraftservices.com", 443, ssl=ssl.SSLContext(),
+                                                       ssl_handshake_timeout=5)
+        log.debug(f"Connected for gc on account {self.email}")
+        writer.write(self.gc_data[0:-2])
+
+        await writer.drain()
+        self.readers_writers.append((reader, writer))
+
+    async def gc(self, writer):
+        writer.write(self.gc_data[-2:])
+        await writer.drain()
+        log.info(f"sent request @ {time.time()}")
+        # Ignore for gc
+        # Simpler code 🔽 encompasses all of these snipe* functions
+        # async with snipe_session.put("https://api.minecraftservices.com/minecraft/profile/name/%s" % "blah",
+        #                              headers={
+        #                                  "Authorization": "Bearer %s" % self.bearer, "Content-Type": "application/json
+        # ^^^^ THAT LINE IS INVALID YOU NEED A " AT THE END ^^^
+        #                              }) as r:
+        #     print("[%s] %s @ %5f" % (name, r.status, time.time()))
+        #     if r.status == 204:
+        #         return True, self.email
+        #     else:
+        #         return False, None
+
+    async def gc_read(self, name: str, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> (bool, str):
         resp = await reader.read(12)
         now = time.time()
         status = int(resp[9:12])

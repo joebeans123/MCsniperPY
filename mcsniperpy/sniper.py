@@ -120,6 +120,10 @@ class Sniper:
 
         # async def snipe_read(self, name: str, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
 
+    async def gc(self, droptime, target, offset, req_count, start_auth):
+        pass
+        # probably use some code from the snipe function
+
     def on_shutdown(self):
         if self.session.session is not None:
             asyncio.run(self.session.session.close())
